@@ -1,0 +1,78 @@
+ Web.xml
+ <web-app>
+ <!--Define the LoginServlet servlet-->
+ <servlet>
+ <servlet-name>LoginServlet</servlet-name>
+ <servlet-class>LoginServlet</servlet-class>
+ </servlet>
+ <!--Mapping for LoginServlet-->
+ <servlet-mapping>
+ <servlet-name>LoginServlet</servlet-name>
+ <url-pattern>/Login</url-pattern>
+ </servlet-mapping>
+ <!--Define welcome file list-->
+ <welcome-file-list>
+ <welcome-file>login.html</welcome-file>
+ </welcome-file-list>
+ </web-app>
+ Login.html
+ <!DOCTYPE html>
+ <html>
+ <head>
+ <title>Login</title>
+</head>
+ <body>
+ <h2>Login Page</h2>
+ <form action="Login" method="POST">
+ Username: <input type="text" name="username" required><br>
+ Password: <input type="password" name="password" required><br>
+ <input type="submit" value="Login">
+ </form>
+ </body>
+ </html>
+ LoginServlet.java
+ import java.io.*;
+ import java.text.SimpleDateFormat;
+ import java.util.Date;
+ import jakarta.servlet.*;
+ import jakarta.servlet.http.*;
+ public class LoginServlet extends HttpServlet {
+ public void doPost(HttpServletRequest req, HttpServletResponse res)
+ throws ServletException, IOException {
+ res.setContentType("text/html");
+ PrintWriter pw = res.getWriter();
+ String username = req.getParameter("username");
+ String password = req.getParameter("password");
+ if ("user".equals(username) && "pass".equals(password)) { //
+ Dummy credentials for testing
+ // Retrieve the last login time if it exists
+ Cookie[] cookies = req.getCookies();
+ String lastLoginTime = "This is your first login!";
+ if (cookies != null) {
+ for (Cookie cookie : cookies) {
+ if ("lastLogin".equals(cookie.getName())) {
+ lastLoginTime = cookie.getValue().replace("_",
+ " "); // Replace underscores with spaces for display
+ }
+}
+ }
+ // Set the current login time with underscores instead of
+ spaces
+ String currentLoginTime = new
+ SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+ Cookie lastLoginCookie = new Cookie("lastLogin",
+ currentLoginTime);
+ res.addCookie(lastLoginCookie);
+ // Display the welcome message with the last login time
+ pw.println("<html><body>");
+ pw.println("<h2>Welcome, " + username + "!</h2>");
+ pw.println("<p>Your last login was: " + lastLoginTime +
+ "</p>");
+ pw.println("</body></html>");
+ } else {
+ pw.println("<html><body><p>Invalid username or password.
+ Please try again.</p></body></html>");
+ }
+ pw.close();
+ }
+ }
